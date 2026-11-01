@@ -4,6 +4,10 @@ const root=document.body.dataset.root||"";
 const norm=s=>(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
 const pct=r=>{r=+r;let s=r>=0.1||r===0?r.toFixed(1):r.toFixed(2);s=s.replace(/\.?0+$/,"");return s.replace(".",",")+"%"};
 
+(function(){const g=$("#goto");if(!g)return;
+  const m=location.pathname.match(/\/c\/([^\/]+?)(?:\.html)?$/);if(m&&[...g.options].some(o=>o.value===m[1]))g.value=m[1];
+  g.addEventListener("change",()=>{if(g.value)location.href=root+"c/"+g.value+".html"})})();
+
 if(window.PAGE==="index"){
   const cards=$$("#grid .card"),grid=$("#grid");let data=null;
   const byslug={};

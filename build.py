@@ -162,6 +162,8 @@ def fmt_date(ts):
     if not ts: return "—"
     return datetime.datetime.fromtimestamp(ts, datetime.timezone.utc).strftime("%d/%m/%Y")
 
+GOTO = ""
+
 def page(title, body, depth=0, desc="Catálogo completo dos Presentes colecionáveis do Telegram", extra_head=""):
     pre = "../" * depth
     return f"""<!doctype html>
@@ -173,6 +175,7 @@ def page(title, body, depth=0, desc="Catálogo completo dos Presentes colecioná
 <link rel="stylesheet" href="{pre}style.css">{extra_head}</head>
 <body data-root="{pre}">
 <header class="top"><a class="brand" href="{pre}index.html">🎁 <b>Presentes</b> Telegram</a>
+<select id="goto" aria-label="Ir para a coleção" title="Ir para a coleção (da primeira à última)"><option value="">Ir para a coleção…</option>{GOTO}</select>
 <nav><a href="{pre}index.html">Coleções</a><a href="{pre}fundos.html">Fundos</a><a href="{pre}sobre.html">Sobre</a></nav></header>
 <main>{body}</main>
 <footer>Dados públicos de <a href="https://changes.tg" rel="noopener">changes.tg</a>, preços mínimos de <a href="https://portal-market.com" rel="noopener">Portals</a> e prévias de <a href="https://t.me/nft" rel="noopener">t.me/nft</a>. Site não oficial, sem vínculo com o Telegram.</footer>
@@ -180,6 +183,9 @@ def page(title, body, depth=0, desc="Catálogo completo dos Presentes colecioná
 
 def render(cols, built):
     built_br = datetime.datetime.strptime(built, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc).astimezone(datetime.timezone(datetime.timedelta(hours=-3))).strftime("%d/%m/%Y %H:%M")
+    global GOTO
+    chron = sorted(cols, key=lambda c: (c["released"] or 0, c["name"].lower()))
+    GOTO = "".join(f'<option value="{c["slug"]}">#{i} {esc(c["name"])}</option>' for i, c in enumerate(chron, 1))
     all_bd = {}
     all_sym = {}
     for c in cols:
@@ -190,7 +196,7 @@ def render(cols, built):
     total_models = sum(len(c["models"]) for c in cols)
     # ---- index
     cards = []
-    for c in cols:
+    for c in sorted(cols, key=lambda c: (-(c["floor"] if c["floor"] is not None else -1), c["name"].lower())):
         cards.append(f"""<a class="card" href="c/{c['slug']}.html" data-slug="{c['slug']}">
 <div class="thumb"><img loading="lazy" decoding="async" src="{esc(c['cover'])}" alt="{esc(c['name'])}" width="160" height="160"></div>
 <h3>{esc(c['name'])}</h3>
@@ -207,7 +213,7 @@ def render(cols, built):
 <select id="fSymbol"><option value="">Símbolo: todos</option>{sym_opts}</select>
 <input id="fModel" type="search" placeholder="Modelo…" list="modelList" autocomplete="off">
 <select id="fRarity" title="Raridade máxima do atributo filtrado"><option value="">Raridade: qualquer</option><option value="0.5">≤ 0,5% (lendário)</option><option value="1">≤ 1% (épico)</option><option value="2">≤ 2% (raro)</option><option value="5">≤ 5%</option></select>
-<select id="sort"><option value="name">Ordenar: nome</option><option value="floor-desc">Preço mínimo ↓</option><option value="floor-asc">Preço mínimo ↑</option><option value="supply-asc">Menor tiragem</option><option value="supply-desc">Maior tiragem</option><option value="new">Mais recentes</option><option value="old">Mais antigos</option></select>
+<select id="sort"><option value="floor-desc" selected>Mais caros primeiro</option><option value="name">Ordenar: nome</option><option value="floor-asc">Preço mínimo ↑</option><option value="supply-asc">Menor tiragem</option><option value="supply-desc">Maior tiragem</option><option value="new">Mais recentes</option><option value="old">Mais antigos</option></select>
 <span id="count" class="count"></span></section>
 <datalist id="modelList"></datalist>
 <section class="grid" id="grid">{''.join(cards)}</section>
