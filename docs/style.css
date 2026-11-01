@@ -60,3 +60,14 @@ dialog h3{margin:6px 0 2px}dialog p{margin:0;color:var(--mut)}.x{position:absolu
 #goto{max-width:100%;min-width:0;background:#161b22;color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:14px}
 @media(max-width:600px){#goto{font-size:14px}}
 .crumb #goto{margin-left:12px}
+
+.owners{margin:18px 0}.owners h2{margin:0 0 6px}.mut{color:var(--mut);font-size:14px}
+.ogrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.oc{background:#161b22;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.oc .pv{position:relative;display:block;aspect-ratio:1;overflow:hidden}
+.oc .pv img{position:absolute;inset:12%;width:76%;height:76%;object-fit:contain}
+.oc .pv i{position:absolute;width:16px;height:16px;opacity:.55;-webkit-mask-size:contain;mask-size:contain;-webkit-mask-repeat:no-repeat;mask-repeat:no-repeat}
+.oc .pv b{position:absolute;top:6px;left:8px;font-size:12px;color:#fff;text-shadow:0 1px 2px #0008;z-index:2}
+.oc .od{padding:8px 10px;display:flex;flex-direction:column;gap:3px;min-width:0}
+.oc .ow{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--tx)}
+.oc a.ow{color:#6ab3f3}.oc .od small{color:var(--mut);font-size:11px}

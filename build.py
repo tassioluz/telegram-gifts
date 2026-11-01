@@ -261,6 +261,8 @@ def render(cols, built):
 <div class="bwrap"><div class="preview" id="preview"><div class="pat" id="pat"></div><img id="pModel" alt=""></div>
 <div class="bctl"><label>Modelo<select id="bModel">{mopts}</select></label><label>Fundo<select id="bBackdrop">{bopts}</select></label><label>Símbolo<select id="bSymbol">{sopts}</select></label>
 <p id="bOdds" class="odds"></p><button id="bRandom" type="button">🎲 Aleatório (pela raridade)</button></div></div></section>
+<section class="owners" id="owners" data-slug="{c['slug']}" data-tslug="{esc(c.get('tslug') or '')}" hidden>
+<h2>👤 Donos</h2><p class="mut" id="ownersInfo"></p><div class="ogrid" id="ownersGrid"></div></section>
 <nav class="tabs"><button data-tab="models" class="on">Modelos ({len(c['models'])})</button><button data-tab="backdrops">Fundos ({len(c['backdrops'])})</button><button data-tab="symbols">Símbolos ({len(c['symbols'])})</button></nav>
 <section class="filters"><input id="iq" type="search" placeholder="Filtrar por nome…" autocomplete="off">
 <select id="ir"><option value="">Raridade: qualquer</option><option value="0.5">≤ 0,5%</option><option value="1">≤ 1%</option><option value="2">≤ 2%</option><option value="5">≤ 5%</option></select>

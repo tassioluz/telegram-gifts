@@ -50,6 +50,31 @@ function itemFilter(){
 itemFilter();
 
 if(window.PAGE==="collection"){
+  (function owners(){
+    const sec=$("#owners");if(!sec)return;
+    fetch(root+"o/"+sec.dataset.slug+".json").then(r=>r.ok?r.json():null).then(d=>{
+      if(!d||!d.items||!d.items.length)return;
+      const mi={},bd={},sy={};
+      $$('[data-pane="models"] .item').forEach(e=>mi[e.dataset.n]=e.querySelector("img").src);
+      $$(".item.bd").forEach(e=>bd[e.dataset.n]=e.dataset);
+      $$('[data-pane="symbols"] .item').forEach(e=>sy[e.dataset.n]=e.querySelector("img").src);
+      const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+      const short=a=>a.length>16?a.slice(0,6)+"…"+a.slice(-6):a;
+      const spots=[[50,10],[20,22],[80,22],[10,50],[90,50],[20,80],[80,80],[50,92]];
+      const owner=(t,isAddr)=>{
+        if(!isAddr)return '<span class="ow" title="Perfil sem link público">'+esc(t)+'</span>';
+        if(/\.t\.me$/i.test(t)){const u=t.replace(/\.t\.me$/i,"");return '<a class="ow" href="https://t.me/'+encodeURIComponent(u)+'" target="_blank" rel="noopener">@'+esc(u)+'</a>'}
+        return '<a class="ow" href="https://tonviewer.com/'+encodeURIComponent(t)+'" target="_blank" rel="noopener" title="Carteira TON">💎 '+esc(short(t))+'</a>'};
+      const html=d.items.map(([n,t,isAddr,m,b,s])=>{
+        const B=bd[b],bg=B?"radial-gradient(circle at 50% 45%,"+B.c+" 0%,"+B.e+" 100%)":"#222";
+        const url=sy[s]||"";
+        const pat=url?spots.map(([x,y])=>'<i style="left:calc('+x+'% - 8px);top:calc('+y+'% - 8px);background:'+(B?B.p:"#000")+';-webkit-mask-image:url(\''+url+'\');mask-image:url(\''+url+'\')"></i>').join(""):"";
+        return '<article class="oc"><a class="pv" style="background:'+bg+'" href="https://t.me/nft/'+esc(d.tslug)+'-'+n+'" target="_blank" rel="noopener" title="Abrir no Telegram">'+pat+(mi[m]?'<img src="'+mi[m]+'" alt="'+esc(m)+'" loading="lazy">':"")+'<b>#'+n+'</b></a>'
+          +'<div class="od">'+owner(t,isAddr)+'<small>'+esc(m)+' · '+esc(b)+' · '+esc(s)+'</small></div></article>'}).join("");
+      $("#ownersGrid").innerHTML=html;
+      $("#ownersInfo").textContent="Donos dos primeiros "+d.items.length+" presentes desta coleção, vistos nas páginas públicas do Telegram. Quem tem @usuário ou carteira TON aparece com link; os demais só mostram o nome de exibição. Clique na imagem para abrir o presente no Telegram.";
+      sec.hidden=false}).catch(()=>{});
+  })();
   const G=window.GIFT,dlg=$("#dlg");let anim=null;
   const enc=x=>encodeURIComponent(x.replace(/\u2019/g,"'").replace(/\//g,"\\"));
   function play(url,el){if(!window.lottie){return false}
