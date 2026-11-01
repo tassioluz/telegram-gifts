@@ -163,6 +163,12 @@ def fmt_date(ts):
     return datetime.datetime.fromtimestamp(ts, datetime.timezone.utc).strftime("%d/%m/%Y")
 
 GOTO = ""
+VER = "0"
+
+def goto_select():
+    return (f'<select id="goto" aria-label="Ir para a coleção" title="Ir para a coleção (da primeira à última)" '
+            f'onchange="if(this.value)location.href=document.body.dataset.root+\'c/\'+this.value+\'.html\'">'
+            f'<option value="">Ir para a coleção (1ª a última)…</option>{GOTO}</select>')
 
 def page(title, body, depth=0, desc="Catálogo completo dos Presentes colecionáveis do Telegram", extra_head=""):
     pre = "../" * depth
@@ -172,18 +178,18 @@ def page(title, body, depth=0, desc="Catálogo completo dos Presentes colecioná
 <title>{esc(title)}</title><meta name="description" content="{esc(desc)}">
 <meta property="og:title" content="{esc(title)}"><meta property="og:description" content="{esc(desc)}">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎁</text></svg>">
-<link rel="stylesheet" href="{pre}style.css">{extra_head}</head>
+<link rel="stylesheet" href="{pre}style.css?v={VER}">{extra_head}</head>
 <body data-root="{pre}">
 <header class="top"><a class="brand" href="{pre}index.html">🎁 <b>Presentes</b> Telegram</a>
-<select id="goto" aria-label="Ir para a coleção" title="Ir para a coleção (da primeira à última)"><option value="">Ir para a coleção…</option>{GOTO}</select>
 <nav><a href="{pre}index.html">Coleções</a><a href="{pre}fundos.html">Fundos</a><a href="{pre}sobre.html">Sobre</a></nav></header>
 <main>{body}</main>
 <footer>Dados públicos de <a href="https://changes.tg" rel="noopener">changes.tg</a>, preços mínimos de <a href="https://portal-market.com" rel="noopener">Portals</a> e prévias de <a href="https://t.me/nft" rel="noopener">t.me/nft</a>. Site não oficial, sem vínculo com o Telegram.</footer>
-<script src="{pre}app.js" defer></script></body></html>"""
+<script src="{pre}app.js?v={VER}" defer></script></body></html>"""
 
 def render(cols, built):
     built_br = datetime.datetime.strptime(built, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=datetime.timezone.utc).astimezone(datetime.timezone(datetime.timedelta(hours=-3))).strftime("%d/%m/%Y %H:%M")
-    global GOTO
+    global GOTO, VER
+    VER = built.replace(":", "").replace("-", "")
     chron = sorted(cols, key=lambda c: (c["released"] or 0, c["name"].lower()))
     GOTO = "".join(f'<option value="{c["slug"]}">#{i} {esc(c["name"])}</option>' for i, c in enumerate(chron, 1))
     all_bd = {}
@@ -208,6 +214,7 @@ def render(cols, built):
     body = f"""<section class="hero"><h1>Todos os Presentes colecionáveis do Telegram</h1>
 <p>{len(cols)} coleções · {fmt_int(total_models)} modelos · {len(all_bd)} fundos · {len(all_sym)} símbolos. Atualizado em {built_br} (Brasília).</p></section>
 <section class="filters" id="filters">
+{goto_select()}
 <input id="q" type="search" placeholder="Buscar coleção ou modelo… (ex.: Pepe, Gold)" autocomplete="off">
 <select id="fBackdrop"><option value="">Fundo: todos</option>{bd_opts}</select>
 <select id="fSymbol"><option value="">Símbolo: todos</option>{sym_opts}</select>
@@ -235,7 +242,7 @@ def render(cols, built):
         mopts = "".join(f'<option value="{esc(m["n"])}">{esc(m["n"])} ({pct(m["r"])})</option>' for m in c["models"])
         bopts = "".join(f'<option value="{esc(b["n"])}">{esc(b["n"])} ({pct(b["r"])})</option>' for b in c["backdrops"])
         sopts = "".join(f'<option value="{esc(s["n"])}">{esc(s["n"])} ({pct(s["r"])})</option>' for s in c["symbols"])
-        body = f"""<p class="crumb"><a href="../index.html">← Todas as coleções</a></p>
+        body = f"""<p class="crumb"><a href="../index.html">← Todas as coleções</a> {goto_select()}</p>
 <section class="head">
 <div class="cover" id="coverAnim" data-lottie="{esc(original_lottie(c['id'])) if c['id'] else ''}"><img src="{esc(cover)}" alt="{esc(c['name'])}" width="200" height="200"></div>
 <div><h1>{esc(c['name'])}</h1>
